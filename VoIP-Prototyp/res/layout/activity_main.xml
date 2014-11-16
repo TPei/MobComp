@@ -44,7 +44,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/portInput"
-        android:text="(Dis-)Connect" 
+        android:text="Connect" 
         android:onClick="callButtonClick"/>
     
     <TextView

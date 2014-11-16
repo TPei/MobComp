@@ -32,9 +32,11 @@ public class MainActivity extends Activity {
 	private TextView addressField;
 	private EditText addressInput;
 	private EditText portInput;
-	private TextView callState;
+	private TextView callStateInfo;
+	private Button connectButton;
 	
-	private boolean isInCall = false;
+	private enum CALL_STATES {IDLE, CONNECTED};
+	private CALL_STATES callState = CALL_STATES.IDLE; 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +47,8 @@ public class MainActivity extends Activity {
         addressField = (TextView)(findViewById(R.id.addressField));
         addressInput = (EditText)(findViewById(R.id.addressInput));
         portInput = (EditText)(findViewById(R.id.portInput));
-        callState = (TextView)(findViewById(R.id.callState));
+        callStateInfo = (TextView)(findViewById(R.id.callState));
+        connectButton = (Button)(findViewById(R.id.connectButton));
         
         //get connection info
         WifiManager wifiMan = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
@@ -89,39 +92,63 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * call button was clicked
+     * @param view
+     */
     public void callButtonClick(View view)
     {
-    	Log.v(TAG, "callButtonClick(): isInCall = " + isInCall);
+    	Log.v(TAG, "callButtonClick(): callState = " + callState);
     	
     	if (audioGroup != null && voipStream != null)
     	{    		
-    		if (isInCall == false)
-    		{
-    			String remoteIP = addressInput.getText().toString();
-        		int remotePort = Integer.parseInt(portInput.getText().toString());
-        		
-        		try 
-        		{
-        			//connect stream to remote client
-    				voipStream.associate(InetAddress.getByName(remoteIP), remotePort);
-    				voipStream.join(audioGroup);    
-    				
-    				isInCall = true;
-            		callState.setText("Status: CONNECTED");
-    			} 
-        		catch (Exception e) 
-        		{
-    				Log.e(TAG, "Exception:" + e.getStackTrace());
-    			}       
-        	}
-    		else
-    		{
-    			//leave group
-    			voipStream.join(null);	
-    			
-    			isInCall = false;
-    			callState.setText("Status: IDLE");
-    		}       	 
+    		switch(callState) 
+        	{
+    	    	case IDLE:
+    	    		connectCall();
+    	    		break;
+    	    		
+    	    	case CONNECTED:
+    	    		disconnectCall();
+    	    		break;
+        	}    	 
     	}
+    }
+    
+    /** 
+     * join voidStream for call
+     */
+    public void connectCall()
+    {
+    	String remoteIP = addressInput.getText().toString();
+		int remotePort = Integer.parseInt(portInput.getText().toString());
+		
+		try 
+		{
+			//connect stream to remote client
+			voipStream.associate(InetAddress.getByName(remoteIP), remotePort);
+			voipStream.join(audioGroup);    
+			
+			callState = CALL_STATES.CONNECTED;
+    		callStateInfo.setText("Status: CONNECTED");
+    		connectButton.setText("Disconnect");
+		} 
+		catch (Exception e) 
+		{
+			Log.e(TAG, "Exception:" + e.getStackTrace());
+		}  
+    }
+    
+    /**
+     * disconnect from voipStream
+     */
+    public void disconnectCall()
+    {
+    	//leave group
+		voipStream.join(null);	
+		
+		callState = CALL_STATES.IDLE;
+		callStateInfo.setText("Status: IDLE");
+		connectButton.setText("Connect");
     }
 }

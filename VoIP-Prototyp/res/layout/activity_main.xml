@@ -7,7 +7,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="fhfl.voip_prototyp.MainActivity" >
-  
+
     <TextView
         android:id="@+id/addressField"
         android:layout_width="wrap_content"
@@ -22,31 +22,45 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="45dp"
-        android:ems="10" 
-        android:text="" 
-        android:hint="Remote-IP" />
-    
+        android:ems="10"
+        android:hint="Remote-IP"
+        android:text="" />
+
     <EditText
         android:id="@+id/portInput"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="45dp"
+        android:layout_alignLeft="@+id/addressInput"
         android:layout_below="@+id/addressInput"
-        android:ems="10"  
-        android:text=""
-    	android:hint="Remote-Port" />
-    
+        android:layout_marginTop="20dp"
+        android:ems="10"
+        android:hint="Remote-Port" >
+
+        <requestFocus />
+    </EditText>
+
+    <Button
+        android:id="@+id/audioMode"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/portInput"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:onClick="audioModeBtnClick"
+        android:text="Audio Mode" />
+
     <Button
         android:id="@+id/connectButton"
         style="?android:attr/buttonStyleSmall"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/portInput"
-        android:text="Connect" 
-        android:onClick="callButtonClick"/>
-    
+        android:layout_alignLeft="@+id/audioMode"
+        android:layout_below="@+id/audioMode"
+        android:layout_marginTop="20dp"
+        android:onClick="callButtonClick"
+        android:text="Connect" />
+
     <TextView
         android:id="@+id/callState"
         android:layout_width="wrap_content"
@@ -55,6 +69,5 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
         android:text="Status: IDLE" />
-
 
 </RelativeLayout>

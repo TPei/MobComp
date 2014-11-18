@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.media.AudioManager;
 import android.net.rtp.AudioCodec;
 import android.net.rtp.AudioGroup;
 import android.net.rtp.AudioStream;
@@ -27,6 +28,8 @@ public class MainActivity extends Activity {
 
 	private AudioGroup audioGroup;
 	private AudioStream voipStream;
+	
+	private AudioManager audioManager;
 
 	private TextView addressField;
 	private EditText addressInput;
@@ -60,6 +63,8 @@ public class MainActivity extends Activity {
 		String ip = String.format("%d.%d.%d.%d", (ipAddress & 0xff),
 				(ipAddress >> 8 & 0xff), (ipAddress >> 16 & 0xff),
 				(ipAddress >> 24 & 0xff));
+		
+		audioManager = (AudioManager)((Context)this).getSystemService(Context.AUDIO_SERVICE);
 
 		audioGroup = new AudioGroup();
 		audioGroup.setMode(AudioGroup.MODE_ECHO_SUPPRESSION);
@@ -156,6 +161,8 @@ public class MainActivity extends Activity {
 			callState = CALL_STATES.CONNECTED;
 			callStateInfo.setText("Status: CONNECTED");
 			connectButton.setText("Disconnect");
+			
+			audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
 		} catch (Exception e) {
 			Log.e(TAG, "Exception:" + e.getStackTrace());
 		}
@@ -172,5 +179,7 @@ public class MainActivity extends Activity {
 		callState = CALL_STATES.IDLE;
 		callStateInfo.setText("Status: IDLE");
 		connectButton.setText("Connect");
+		
+		audioManager.setMode(AudioManager.MODE_NORMAL);
 	}
 }

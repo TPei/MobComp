@@ -67,10 +67,10 @@ public class MainActivity extends Activity {
 		audioManager = (AudioManager)((Context)this).getSystemService(Context.AUDIO_SERVICE);
 
 		audioGroup = new AudioGroup();
-		audioGroup.setMode(AudioGroup.MODE_ECHO_SUPPRESSION);
+		audioGroup.setMode(AudioGroup.MODE_NORMAL);
 		try {
 			voipStream = new AudioStream(InetAddress.getByName(ip));
-			voipStream.setCodec(AudioCodec.AMR);
+			voipStream.setCodec(AudioCodec.GSM);
 			voipStream.setMode(RtpStream.MODE_NORMAL);
 
 			int port = voipStream.getLocalPort();

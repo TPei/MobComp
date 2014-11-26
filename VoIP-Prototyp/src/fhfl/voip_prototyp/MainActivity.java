@@ -22,9 +22,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements AsyncTaskCompleted {
 
 	private static final String TAG = "fhfl.voip_prototyp.MainActivity";
+	
+	private final String[] ipProvider = {
+			"http://ipinfo.io/json", //ganzes json
+			"http://ipinfo.io/ip", // nur ip als string
+			"http://ip-api.com/json",
+			"http://trackip.net/ip?json"
+			
+	};
 
 	private AudioGroup audioGroup;
 	private AudioStream voipStream;
@@ -181,5 +189,22 @@ public class MainActivity extends Activity {
 		connectButton.setText("Connect");
 		
 		audioManager.setMode(AudioManager.MODE_NORMAL);
+	}
+
+	/**
+	 * Clickhandler
+	 * @param view
+	 */
+	public void ipBtnClick (View view) {
+		new JsonRequest(ipProvider[1]).setListener(this).execute();
+	}
+	
+	/**
+	 * wird aufgerufen wenn die Html Request abgeschlossen ist
+	 */
+	@Override
+	public void onTaskCompleted(String result) {
+		TextView ipField = (TextView) (findViewById(R.id.publicIp));
+		ipField.setText(result);
 	}
 }

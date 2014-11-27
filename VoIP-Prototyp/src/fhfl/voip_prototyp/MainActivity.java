@@ -1,5 +1,6 @@
 package fhfl.voip_prototyp;
 
+import java.io.IOException;
 import java.net.InetAddress;
 
 import android.app.Activity;
@@ -55,7 +56,16 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
+		
+		//starte AddressReceiveServerThread
+		//das sollte nur/erst beim Versenden der SMS getan werden!!!!
+		try {
+			new AddressReceiveServer(this).start();
+		} catch (IOException e1) {
+			//whoops!
+		}
+		
+		
 		// get the view elements
 		addressField = (TextView) (findViewById(R.id.addressField));
 		addressInput = (EditText) (findViewById(R.id.addressInput));
@@ -206,5 +216,15 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 	public void onTaskCompleted(String result) {
 		TextView ipField = (TextView) (findViewById(R.id.publicIp));
 		ipField.setText(result);
+	}
+	
+	/**
+	 * wird aufgerufen, wenn der AddressReceiverServer Adressdaten erhält
+	 * @param remoteIP IP unter der der Remote-Client erreichbar ist
+	 * @param remotePort Port unter dem der Remote-Client erreichbar ist
+	 */
+	public void setRemoteAddress(String remoteIP, int remotePort) {
+		Log.v(TAG, "setRemoteAddress() " + remoteIP + ":" + remotePort);
+		//hier den stream associaten
 	}
 }

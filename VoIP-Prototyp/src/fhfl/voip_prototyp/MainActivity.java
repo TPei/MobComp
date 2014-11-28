@@ -180,13 +180,15 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 		startActivity(smsIntent);*/
 		
 		// bei mir auf dem Emulator startet das eine SMS und auf lollipop wo das failed eine email
-		Intent intent = new Intent(Intent.ACTION_SEND);
+		Intent intent=new Intent(android.content.Intent.ACTION_SEND);
 		intent.setType("text/plain");
-		//intent.putExtra(Intent.EXTRA_EMAIL, "emailaddress@emailaddress.com");
-		intent.putExtra(Intent.EXTRA_SUBJECT, "Voip Daten");
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+
+		// Add data to the intent, the receiving app will decide what to do with it.
 		intent.putExtra(Intent.EXTRA_TEXT, "Hey! Lass und Voipen. Meine ip ist: " + ip + " und mein Port ist: " + port);
 
-		startActivity(Intent.createChooser(intent, "Send Email"));
+		startActivity(Intent.createChooser(intent, "Choose sharing action"));
+
 	}
 
 	/**

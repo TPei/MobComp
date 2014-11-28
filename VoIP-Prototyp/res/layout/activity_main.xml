@@ -60,12 +60,23 @@
         android:layout_marginTop="20dp"
         android:onClick="callButtonClick"
         android:text="Connect" />
+    
+    <Button
+        android:id="@+id/shareIPButton"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/connectButton"
+        android:layout_below="@+id/connectButton"
+        android:layout_marginTop="20dp"
+        android:onClick="shareIPButtonClick"
+        android:text="share IP" />
 
     <TextView
         android:id="@+id/callState"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/connectButton"
+        android:layout_below="@+id/shareIPButton"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
         android:text="Status: IDLE" />

@@ -7,7 +7,9 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.net.rtp.AudioCodec;
 import android.net.rtp.AudioGroup;
 import android.net.rtp.AudioStream;
@@ -45,6 +47,8 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 	private EditText portInput;
 	private TextView callStateInfo;
 	private Button connectButton;
+	private int port;
+	private String ip;
 
 	private enum CALL_STATES {
 		IDLE, CONNECTED
@@ -78,7 +82,7 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 				.getSystemService(Context.WIFI_SERVICE);
 		WifiInfo wifiInf = wifiMan.getConnectionInfo();
 		int ipAddress = wifiInf.getIpAddress();
-		String ip = String.format("%d.%d.%d.%d", (ipAddress & 0xff),
+		ip = String.format("%d.%d.%d.%d", (ipAddress & 0xff),
 				(ipAddress >> 8 & 0xff), (ipAddress >> 16 & 0xff),
 				(ipAddress >> 24 & 0xff));
 		
@@ -91,7 +95,7 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 			voipStream.setCodec(AudioCodec.GSM);
 			voipStream.setMode(RtpStream.MODE_NORMAL);
 
-			int port = voipStream.getLocalPort();
+			port = voipStream.getLocalPort();
 			addressField.setText("Eigene Adresse: " + ip + " : " + port);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -163,6 +167,27 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 		AlertDialog dialog = builder.create();
 		dialog.show();
 	}
+	
+	/**
+	 * share IP via SMS
+	 * @param view
+	 */
+	public void shareIPButtonClick(View view){
+		/*
+		Intent smsIntent = new Intent(Intent.ACTION_VIEW);
+		smsIntent.setData(Uri.parse("sms:"));
+		smsIntent.putExtra("sms_body", "Hey! Lass und Voipen. Meine ip ist: " + ip + " und mein Port ist: " + port); 
+		startActivity(smsIntent);*/
+		
+		// bei mir auf dem Emulator startet das eine SMS und auf lollipop wo das failed eine email
+		Intent intent = new Intent(Intent.ACTION_SEND);
+		intent.setType("text/plain");
+		//intent.putExtra(Intent.EXTRA_EMAIL, "emailaddress@emailaddress.com");
+		intent.putExtra(Intent.EXTRA_SUBJECT, "Voip Daten");
+		intent.putExtra(Intent.EXTRA_TEXT, "Hey! Lass und Voipen. Meine ip ist: " + ip + " und mein Port ist: " + port);
+
+		startActivity(Intent.createChooser(intent, "Send Email"));
+	}
 
 	/**
 	 * join voidStream for call
@@ -216,6 +241,10 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 	public void onTaskCompleted(String result) {
 		TextView ipField = (TextView) (findViewById(R.id.publicIp));
 		ipField.setText(result);
+		
+		// sollte das nicht eher dann hier ins eigentliche Feld?
+		ip = result;
+		addressField.setText("Eigene Adresse: " + ip + " : " + port);
 	}
 	
 	/**

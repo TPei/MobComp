@@ -1,15 +1,12 @@
 package fhfl.voip_prototyp;
 
-import java.io.IOException;
 import java.net.InetAddress;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.AudioManager;
-import android.net.Uri;
 import android.net.rtp.AudioCodec;
 import android.net.rtp.AudioGroup;
 import android.net.rtp.AudioStream;
@@ -61,14 +58,7 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		//starte AddressReceiveServerThread
-		//das sollte nur/erst beim Versenden der SMS getan werden!!!!
-		try {
-			new AddressReceiveServer(this).start();
-		} catch (IOException e1) {
-			//whoops!
-		}
-		
+			
 		
 		// get the view elements
 		addressField = (TextView) (findViewById(R.id.addressField));
@@ -185,9 +175,14 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
 
 		// Add data to the intent, the receiving app will decide what to do with it.
-		intent.putExtra(Intent.EXTRA_TEXT, "Hey! Lass und Voipen. Meine ip ist: " + ip + " und mein Port ist: " + port);
+		intent.putExtra(Intent.EXTRA_TEXT, "Hey! Lass uns Voipen. Meine ip ist: " + ip + " und mein Port ist: " + port);
 
 		startActivity(Intent.createChooser(intent, "Choose sharing action"));
+		
+		//startet Server zum Empfangen der Remote-Adresse
+		new AddressReceiver(this).start();
+		//new AddressSender("127.0.0.1", ip, port).start();
+
 
 	}
 
@@ -254,7 +249,7 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 	 * @param remoteIP IP unter der der Remote-Client erreichbar ist
 	 * @param remotePort Port unter dem der Remote-Client erreichbar ist
 	 */
-	public void setRemoteAddress(String remoteIP, int remotePort) {
+	protected void setRemoteAddress(String remoteIP, int remotePort) {
 		Log.v(TAG, "setRemoteAddress() " + remoteIP + ":" + remotePort);
 		//hier den stream associaten
 	}

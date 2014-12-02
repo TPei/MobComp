@@ -18,7 +18,6 @@ public class AddressReceiver extends Thread {
 	
 	public AddressReceiver(MainActivity activity) {
 		this.activity = activity;
-		//hier noch checken, an welche Interfaces gebunden wird
 		try {
 			dSocket = new DatagramSocket(port);
 			incomingPacket = new DatagramPacket(buffer, bufferSize);

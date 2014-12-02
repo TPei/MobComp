@@ -21,6 +21,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity implements AsyncTaskCompleted {
 
@@ -179,9 +180,9 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 
 		startActivity(Intent.createChooser(intent, "Choose sharing action"));
 		
-		//startet Server zum Empfangen der Remote-Adresse
+		//startet Reiceiver zum Empfangen der Remote-Adresse
 		new AddressReceiver(this).start();
-		//new AddressSender("127.0.0.1", ip, port).start();
+		Toast.makeText(this, "AddressReceiver gestartet!", Toast.LENGTH_LONG).show();
 
 
 	}
@@ -252,5 +253,16 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 	protected void setRemoteAddress(String remoteIP, int remotePort) {
 		Log.v(TAG, "setRemoteAddress() " + remoteIP + ":" + remotePort);
 		//hier den stream associaten
+		Toast.makeText(this, "Empfangen: " + remoteIP + ":" + remotePort, Toast.LENGTH_LONG).show();
+	}
+	
+	/**
+	 * for testing....
+	 */
+	public void sendIP(View view) {
+		String remIP = addressInput.getText().toString();
+		new AddressSender(remIP, ip, port).start();
+		Toast.makeText(this, "Gesendet: " + ip + ":" + port + " an " + remIP, Toast.LENGTH_LONG).show();
+		Log.v(TAG, "sendIP() an " + remIP);
 	}
 }

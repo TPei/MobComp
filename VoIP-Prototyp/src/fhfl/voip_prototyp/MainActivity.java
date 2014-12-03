@@ -229,7 +229,7 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 	 * @param view
 	 */
 	public void ipBtnClick (View view) {
-		new JsonRequest(ipProvider[1]).setListener(this).execute();
+		new JsonRequest(ipProvider[1], this).execute();
 	}
 	
 	/**
@@ -237,16 +237,13 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 	 */
 	@Override
 	public void onTaskCompleted(String result) {
-		TextView ipField = (TextView) (findViewById(R.id.publicIp));
-		ipField.setText(result);
-		
-		// sollte das nicht eher dann hier ins eigentliche Feld?
+		// schreib das ergebnis in das ip feld
 		ip = result;
 		addressField.setText("Eigene Adresse: " + ip + " : " + port);
 	}
 	
 	/**
-	 * wird aufgerufen, wenn der AddressReceiverServer Adressdaten erhält
+	 * wird aufgerufen, wenn der AddressReceiverServer Adressdaten erhï¿½lt
 	 * @param remoteIP IP unter der der Remote-Client erreichbar ist
 	 * @param remotePort Port unter dem der Remote-Client erreichbar ist
 	 */

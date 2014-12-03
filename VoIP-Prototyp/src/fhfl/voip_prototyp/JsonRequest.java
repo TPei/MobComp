@@ -7,6 +7,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -32,8 +35,9 @@ public class JsonRequest extends AsyncTask<String, String, String> {
 	 * @param url
 	 *            - Url die angefragt wird
 	 */
-	public JsonRequest(String url) {
+	public JsonRequest(String url, AsyncTaskCompleted listener) {
 		setUrl(url);
+		setListener(listener);
 	}
 
 	/**
@@ -41,8 +45,9 @@ public class JsonRequest extends AsyncTask<String, String, String> {
 	 * @param url
 	 * @param timeout
 	 */
-	public JsonRequest(String url, int timeout) {
+	public JsonRequest(String url, int timeout, AsyncTaskCompleted listener) {
 		setUrl(url);
+		setListener(listener);
 		this.timeout = timeout;
 	}
 
@@ -66,9 +71,8 @@ public class JsonRequest extends AsyncTask<String, String, String> {
 	 * @param listener
 	 * @return JsonRequest
 	 */
-	public JsonRequest setListener(AsyncTaskCompleted listener) {
+	public void setListener(AsyncTaskCompleted listener) {
 		this.listener = listener;
-		return this;
 	}
 
 	@Override
@@ -93,6 +97,7 @@ public class JsonRequest extends AsyncTask<String, String, String> {
 			switch (status) {
 			case 200:
 			case 201:
+				// liest den inputstream aus und fügt diesen zusammen
 				BufferedReader br = new BufferedReader(new InputStreamReader(
 						httpConn.getInputStream()));
 				StringBuilder sb = new StringBuilder();
@@ -113,9 +118,32 @@ public class JsonRequest extends AsyncTask<String, String, String> {
 	@Override
 	protected void onPostExecute(String result) {
 		super.onPostExecute(result);
-		// irgendwo muss das ergebnis noch auf ein ui element gesetzt werden
 		Log.d(TAG, result);
-		listener.onTaskCompleted(result);
+		listener.onTaskCompleted(getIpFromJson(result));
+	}
+
+	/**
+	 * Gibt wenn ein json String übergeben wird, die Values die in dem Feld "ip"
+	 * oder "query" stehen zurück. Wenn keins der beiden Felder vorhanden ist
+	 * wird der komplette String zurückgegeben. Wenn der übergebene String kein
+	 * Json ist wird dieser komplett zurückgegeben.
+	 * 
+	 * @param jsonString
+	 * @return IP-Address as String
+	 */
+	private String getIpFromJson(String jsonString) {
+		try {
+			JSONObject json = new JSONObject(jsonString);
+			if (json.has("ip")) {
+				return json.getString("ip");
+			} else if (json.has("query")) {
+				return json.getString("query");
+			} else {
+				return json.toString();
+			}
+		} catch (JSONException ex) {
+			return jsonString;
+		}
 	}
 
 }

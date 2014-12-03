@@ -90,23 +90,13 @@
         android:onClick="ipBtnClick"
         android:text="getIp" />
 
-    <TextView
-        android:id="@+id/publicIp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/getPublicIp"
-        android:layout_alignBottom="@+id/getPublicIp"
-        android:layout_toRightOf="@+id/getPublicIp"
-        android:text="&lt;- press"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-
     <Button
         android:id="@+id/sendIPBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/callState"
-        android:layout_toRightOf="@+id/callState"
-        android:text="sendIP" 
-        android:onClick="sendIP" />
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:onClick="sendIP"
+        android:text="sendIP" />
 
 </RelativeLayout>

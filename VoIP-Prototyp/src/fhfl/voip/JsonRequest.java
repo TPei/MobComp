@@ -1,4 +1,4 @@
-package fhfl.voip_prototyp;
+package fhfl.voip;
 
 import java.io.BufferedReader;
 import java.io.IOException;

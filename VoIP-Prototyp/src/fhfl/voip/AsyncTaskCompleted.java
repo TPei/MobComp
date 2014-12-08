@@ -1,4 +1,4 @@
-package fhfl.voip_prototyp;
+package fhfl.voip;
 
 public interface AsyncTaskCompleted {
 	void onTaskCompleted(String result);

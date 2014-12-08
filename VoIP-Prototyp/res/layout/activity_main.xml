@@ -6,7 +6,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="fhfl.voip_prototyp.MainActivity" >
+    tools:context="fhfl.voip.MainActivity" >
 
     <TextView
         android:id="@+id/addressField"
@@ -70,7 +70,7 @@
         android:layout_below="@+id/connectButton"
         android:layout_marginTop="20dp"
         android:onClick="shareIPButtonClick"
-        android:text="share IP" />
+        android:text="Invite to call" />
 
     <TextView
         android:id="@+id/callState"
@@ -81,22 +81,13 @@
         android:layout_marginTop="20dp"
         android:text="Status: IDLE" />
 
-    <Button
-        android:id="@+id/getPublicIp"
+    <TextView
+        android:id="@+id/publicAddressField"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:onClick="ipBtnClick"
-        android:text="getIp" />
-
-    <Button
-        android:id="@+id/sendIPBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:onClick="sendIP"
-        android:text="sendIP" />
+        android:layout_alignBottom="@+id/addressField"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="17dp"
+        android:text="" />
 
 </RelativeLayout>

@@ -1,6 +1,9 @@
-package fhfl.voip_prototyp;
+package fhfl.voip;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
+
+import fhfl.voip_prototyp.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -40,6 +43,7 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 	
 	private AudioManager audioManager;
 
+	private TextView publicAddressField;
 	private TextView addressField;
 	private EditText addressInput;
 	private EditText portInput;
@@ -57,11 +61,10 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-		
-			
+		setContentView(R.layout.activity_main);		
 		
 		// get the view elements
+		publicAddressField = (TextView) (findViewById(R.id.publicAddressField));
 		addressField = (TextView) (findViewById(R.id.addressField));
 		addressInput = (EditText) (findViewById(R.id.addressInput));
 		portInput = (EditText) (findViewById(R.id.portInput));
@@ -79,6 +82,7 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 		
 		audioManager = (AudioManager)((Context)this).getSystemService(Context.AUDIO_SERVICE);
 
+		//Erstellen und Konfigurieren der RTP-Objekte
 		audioGroup = new AudioGroup();
 		audioGroup.setMode(AudioGroup.MODE_NORMAL);
 		try {
@@ -88,9 +92,14 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 
 			port = voipStream.getLocalPort();
 			addressField.setText("Eigene Adresse: " + ip + " : " + port);
-		} catch (Exception e) {
-			e.printStackTrace();
+		} 
+		catch (Exception e) 
+		{
+			Log.e(TAG, "onCreate(): error while creating and configuring stream");
 		}
+		
+		//öffentliche IP-Adresse abfragen
+		new JsonRequest(ipProvider[1], this).execute();
 	}
 
 	@Override
@@ -113,7 +122,8 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 	}
 
 	/**
-	 * call button was clicked
+	 * Wird ausgeführt, wenn der Connect/Disconnect-Button gedrückt wird
+	 * baut Verbindung auf oder ab, abhängig davon, ob Verbindung zurzeit besteht
 	 * 
 	 * @param view
 	 */
@@ -160,7 +170,7 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 	}
 	
 	/**
-	 * share IP via SMS
+	 * IP-Adresse und Port via Sharing-Intend teilen
 	 * @param view
 	 */
 	public void shareIPButtonClick(View view){
@@ -176,41 +186,46 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
 
 		// Add data to the intent, the receiving app will decide what to do with it.
-		intent.putExtra(Intent.EXTRA_TEXT, "Hey! Lass uns Voipen. Meine ip ist: " + ip + " und mein Port ist: " + port);
+		intent.putExtra(Intent.EXTRA_TEXT, "Hey! Lass uns Voipen. Meine IP ist: " + ip + " und mein Port ist: " + port);
 
 		startActivity(Intent.createChooser(intent, "Choose sharing action"));
 		
 		//startet Reiceiver zum Empfangen der Remote-Adresse
 		new AddressReceiver(this).start();
-		Toast.makeText(this, "AddressReceiver gestartet!", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, "AddressReceiver gestartet", Toast.LENGTH_LONG).show();
 
 
 	}
 
 	/**
-	 * join voidStream for call
+	 * Verbindet den VoIP-Stream mit den in der View eingegebenen IP-Port-Werten
 	 */
 	public void connectCall() {
+		Log.v(TAG, "connectCall(): ");
+		
+		//IP und Port aus der View holen
 		String remoteIP = addressInput.getText().toString();
 		int remotePort = Integer.parseInt(portInput.getText().toString());
 
 		try {
-			// connect stream to remote client
+			//Eigene IP und Port an remoteClient senden
+			sendIP();
+			//Stream verbinden und der AudioGroup joinen
 			voipStream.associate(InetAddress.getByName(remoteIP), remotePort);
 			voipStream.join(audioGroup);
 
+			//Call-State ändern und View aktualisieren
 			callState = CALL_STATES.CONNECTED;
 			callStateInfo.setText("Status: CONNECTED");
-			connectButton.setText("Disconnect");
-			
+			connectButton.setText("Disconnect");			
 			audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
 		} catch (Exception e) {
-			Log.e(TAG, "Exception:" + e.getStackTrace());
+			Log.e(TAG, "connectCall(): error while connecting call");
 		}
 	}
 
 	/**
-	 * disconnect from voipStream
+	 * VoIP-Stream beenden
 	 */
 	public void disconnectCall() {
 		// leave group
@@ -224,13 +239,6 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 		audioManager.setMode(AudioManager.MODE_NORMAL);
 	}
 
-	/**
-	 * Clickhandler
-	 * @param view
-	 */
-	public void ipBtnClick (View view) {
-		new JsonRequest(ipProvider[1], this).execute();
-	}
 	
 	/**
 	 * wird aufgerufen wenn die Html Request abgeschlossen ist
@@ -238,28 +246,48 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 	@Override
 	public void onTaskCompleted(String result) {
 		// schreib das ergebnis in das ip feld
-		ip = result;
-		addressField.setText("Eigene Adresse: " + ip + " : " + port);
+		publicAddressField.setText("Öffentliche IP: " + result);
 	}
 	
 	/**
-	 * wird aufgerufen, wenn der AddressReceiverServer Adressdaten erhï¿½lt
+	 * wird aufgerufen, wenn der AddressReceiverServer Adressdaten erhält
 	 * @param remoteIP IP unter der der Remote-Client erreichbar ist
 	 * @param remotePort Port unter dem der Remote-Client erreichbar ist
 	 */
 	protected void setRemoteAddress(String remoteIP, int remotePort) {
 		Log.v(TAG, "setRemoteAddress() " + remoteIP + ":" + remotePort);
-		//hier den stream associaten
+		
+		runOnUiThread(new Runnable() {
+		    @Override
+		    public void run() {
+		    	callStateInfo.setText("Status: CONNECTED");
+				connectButton.setText("Disconnect");
+		    }
+		  });	
+				
+		audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
 		Toast.makeText(this, "Empfangen: " + remoteIP + ":" + remotePort, Toast.LENGTH_LONG).show();
+		
+		try 
+		{
+			voipStream.associate(InetAddress.getByName(remoteIP), remotePort);
+			
+		} 
+		catch (UnknownHostException e) 
+		{
+			Log.e(TAG, "setRemoteAddress(): Error while associating stream");
+		}
+		voipStream.join(audioGroup);	
+		callState = CALL_STATES.CONNECTED;
 	}
 	
 	/**
-	 * for testing....
+	 * sendet die eigene IP und Port an den Remote-Client, damit dieser seinen Stream associaten kann
 	 */
-	public void sendIP(View view) {
+	private void sendIP()
+	{
 		String remIP = addressInput.getText().toString();
 		new AddressSender(remIP, ip, port).start();
-		Toast.makeText(this, "Gesendet: " + ip + ":" + port + " an " + remIP, Toast.LENGTH_LONG).show();
 		Log.v(TAG, "sendIP() an " + remIP);
 	}
 }

@@ -26,13 +26,24 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+/**
+ * Stellt eine VoIP Verbindung zwischen zwei Android GerÃ¤ten her. Verbindung
+ * wird etabliert Ã¼ber die IP Addresse des GerÃ¤tes, Austausch der Adressen erfolgt
+ * frei AuswÃ¤hlbar Ã¼ber die auf dem System verfÃ¼gbaren MÃ¶glichkeiten zum Text versenden.
+ * 
+ * BenÃ¶tigte Permissions: ACCESS_WIFI_STATE, INTERNET, RECORD_AUDIO
+ * 
+ */
 public class MainActivity extends Activity implements AsyncTaskCompleted {
 
-	private static final String TAG = "fhfl.voip_prototyp.MainActivity";
+	private static final String TAG = "fhfl.voip.MainActivity";
 	
+	/**
+	 * Services bei denen man die Ã¶ffentliche IP abfragen kann
+	 */
 	private final String[] ipProvider = {
-			"http://ipinfo.io/json", //ganzes json
-			"http://ipinfo.io/ip", // nur ip als string
+			"http://ipinfo.io/json",
+			"http://ipinfo.io/ip",
 			"http://ip-api.com/json",
 			"http://trackip.net/ip?json"
 			
@@ -40,7 +51,6 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 
 	private AudioGroup audioGroup;
 	private AudioStream voipStream;
-	
 	private AudioManager audioManager;
 
 	private TextView publicAddressField;
@@ -98,7 +108,7 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 			Log.e(TAG, "onCreate(): error while creating and configuring stream");
 		}
 		
-		//öffentliche IP-Adresse abfragen
+		// Ã¶ffentliche IP-Adresse abfragen
 		new JsonRequest(ipProvider[1], this).execute();
 	}
 
@@ -122,8 +132,8 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 	}
 
 	/**
-	 * Wird ausgeführt, wenn der Connect/Disconnect-Button gedrückt wird
-	 * baut Verbindung auf oder ab, abhängig davon, ob Verbindung zurzeit besteht
+	 * Wird ausgefï¿½hrt, wenn der Connect/Disconnect-Button gedrï¿½ckt wird
+	 * baut Verbindung auf oder ab, abhï¿½ngig davon, ob Verbindung zurzeit besteht
 	 * 
 	 * @param view
 	 */
@@ -144,28 +154,31 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 	}
 
 	/**
-	 * audio Mode Button was clicked
+	 * audio Mode Button wurde geclicked
 	 * 
 	 * @param view
 	 */
 	public void audioModeBtnClick(View view) {
-		final int[] modes = { AudioGroup.MODE_ECHO_SUPPRESSION,
-				AudioGroup.MODE_MUTED, AudioGroup.MODE_NORMAL,
+		// Array mit den Audiomodes
+		final int[] modes = { AudioGroup.MODE_MUTED, AudioGroup.MODE_NORMAL,
 				AudioGroup.MODE_ON_HOLD };
-		CharSequence[] items = { "MODE_ECHO_SUPPRESSION", "MODE_MUTED",
-				"MODE_NORMAL", "MODE_ON_HOLD" };
+		// Modes als String bzw Charsequence zur Darstellung im Dialog
+		final CharSequence[] items = { "MODE_MUTED", "MODE_NORMAL",
+				"MODE_ON_HOLD" };
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		// erstellen des Dialogfensters zur Auswahl des Audiomodes
 		builder.setTitle("Mode").setItems(items,
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
 						// The 'which' argument contains the index position
 						// of the selected item
 						// int lÃ¤uft von 0 bis length-1
-						Log.d(TAG, "Itemclicked: " + which);
-						// audioGroup.setMode(modes[which]);
+						Log.d(TAG, "Itemclicked: " + items[which]);
+						audioGroup.setMode(modes[which]);
 					}
 				});
 		AlertDialog dialog = builder.create();
+		// Ã¶ffnen des Dialogfensters zur Auswahl des Audiomodes
 		dialog.show();
 	}
 	
@@ -214,7 +227,7 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 			voipStream.associate(InetAddress.getByName(remoteIP), remotePort);
 			voipStream.join(audioGroup);
 
-			//Call-State ändern und View aktualisieren
+			//Call-State ï¿½ndern und View aktualisieren
 			callState = CALL_STATES.CONNECTED;
 			callStateInfo.setText("Status: CONNECTED");
 			connectButton.setText("Disconnect");			
@@ -241,16 +254,16 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 
 	
 	/**
-	 * wird aufgerufen wenn die Html Request abgeschlossen ist
+	 * wird aufgerufen wenn die {@link JsonRequest} abgeschlossen ist
 	 */
 	@Override
 	public void onTaskCompleted(String result) {
 		// schreib das ergebnis in das ip feld
-		publicAddressField.setText("Öffentliche IP: " + result);
+		publicAddressField.setText("Ã¶ffentliche IP: " + result);
 	}
 	
 	/**
-	 * wird aufgerufen, wenn der AddressReceiverServer Adressdaten erhält
+	 * wird aufgerufen, wenn der AddressReceiverServer Adressdaten erhï¿½lt
 	 * @param remoteIP IP unter der der Remote-Client erreichbar ist
 	 * @param remotePort Port unter dem der Remote-Client erreichbar ist
 	 */

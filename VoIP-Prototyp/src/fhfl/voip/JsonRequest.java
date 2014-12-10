@@ -13,27 +13,26 @@ import org.json.JSONObject;
 import android.os.AsyncTask;
 import android.util.Log;
 
-// Params,
-// Progress,
-// Result
 /**
- * Macht ein Html Request an die übergeben url, erwartet einen einfachen String
- * i.e. parsed kein JSON
- * 
- * @author Lennart
- *
+ * Macht ein Http-Request an die übergebene URL und übergibt die erhaltene IP oder bei
+ * einer unerwarteten Antwort die komplette Response an den listener
  */
 public class JsonRequest extends AsyncTask<String, String, String> {
 
-	private static final String TAG = "fhfl.voip_prototyp.GetJson";
+	private static final String TAG = "fhfl.voip.JsonRequest";
 	private int timeout = 2000;
 	private URL url;
+
+	/**
+	 * listener der das Interface {@link AsyncTaskCompleted} implementiert
+	 */
 	private AsyncTaskCompleted listener;
 
 	/**
 	 * 
 	 * @param url
 	 *            - Url die angefragt wird
+	 * @param listener
 	 */
 	public JsonRequest(String url, AsyncTaskCompleted listener) {
 		setUrl(url);
@@ -43,7 +42,10 @@ public class JsonRequest extends AsyncTask<String, String, String> {
 	/**
 	 * 
 	 * @param url
+	 *            - Url die angefragt wird
 	 * @param timeout
+	 *            - timeout in ms
+	 * @param listener
 	 */
 	public JsonRequest(String url, int timeout, AsyncTaskCompleted listener) {
 		setUrl(url);
@@ -83,6 +85,7 @@ public class JsonRequest extends AsyncTask<String, String, String> {
 	@Override
 	protected String doInBackground(String... params) {
 		try {
+			// initialisiere Http-Verbindung
 			HttpURLConnection httpConn = (HttpURLConnection) this.url
 					.openConnection();
 			httpConn.setRequestMethod("GET");
@@ -91,9 +94,13 @@ public class JsonRequest extends AsyncTask<String, String, String> {
 			httpConn.setAllowUserInteraction(false);
 			httpConn.setConnectTimeout(timeout);
 			httpConn.setReadTimeout(timeout);
-			httpConn.connect();
-			int status = httpConn.getResponseCode();
 
+			// Verbinde
+			httpConn.connect();
+
+			// lies den Status Code aus lies die Response bei erfolgreicher
+			// Antwort aus
+			int status = httpConn.getResponseCode();
 			switch (status) {
 			case 200:
 			case 201:
@@ -103,9 +110,12 @@ public class JsonRequest extends AsyncTask<String, String, String> {
 				StringBuilder sb = new StringBuilder();
 				String line;
 				while ((line = br.readLine()) != null) {
-					sb.append(line.trim()); // + "\n"
+					sb.append(line.trim());
 				}
 				br.close();
+
+				// es wird onPostExecute mit diesem Wert als Parameter
+				// aufgerufen
 				return sb.toString();
 			}
 
@@ -118,7 +128,10 @@ public class JsonRequest extends AsyncTask<String, String, String> {
 	@Override
 	protected void onPostExecute(String result) {
 		super.onPostExecute(result);
-		Log.d(TAG, result);
+
+		Log.d(TAG, "JsonRequest Response: " + result);
+		// übergibt die ausgewertete Response an den listener, Auswertung siehe
+		// getIpFromJson
 		listener.onTaskCompleted(getIpFromJson(result));
 	}
 

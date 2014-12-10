@@ -7,11 +7,11 @@ import android.util.Log;
 
 /**
  * Klasse zum Empfangen eines UDP-Pakets auf Port 50500
- * Liest aus der Nachricht IP und Port und übergibt diese an die MainActivity
+ * Liest aus der Nachricht IP und Port und ï¿½bergibt diese an die MainActivity
  *
  */
 public class AddressReceiver extends Thread {
-	private final static String TAG = "fhfl.voip_prototyp.AddressReceiver";
+	private final static String TAG = "fhfl.voip.AddressReceiver";
 	private MainActivity activity;
 	private DatagramSocket dSocket;
 	private DatagramPacket incomingPacket;

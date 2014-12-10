@@ -7,11 +7,11 @@ import java.net.InetSocketAddress;
 import android.util.Log;
 
 /**
- * Klasse zum Versenden der eigenen IP und Port an einen Remoteclient über UDP Port 50500
+ * Klasse zum Versenden der eigenen IP und Port an einen Remoteclient ï¿½ber UDP Port 50500
  *
  */
 class AddressSender extends Thread {
-	private final static String TAG = "fhfl.voip_prototyp.AddressSender";
+	private final static String TAG = "fhfl.voip.AddressSender";
 	final int remotePort = 50500;
 	
 	private String remoteIP = null;

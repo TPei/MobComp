@@ -35,6 +35,7 @@ public class JsonRequest extends AsyncTask<String, String, String> {
 	 * @param listener
 	 */
 	public JsonRequest(String url, AsyncTaskCompleted listener) {
+		Log.v(TAG, "JsonRequest Constr");
 		setUrl(url);
 		setListener(listener);
 	}
@@ -48,6 +49,7 @@ public class JsonRequest extends AsyncTask<String, String, String> {
 	 * @param listener
 	 */
 	public JsonRequest(String url, int timeout, AsyncTaskCompleted listener) {
+		Log.v(TAG, "JsonRequest Constr");
 		setUrl(url);
 		setListener(listener);
 		this.timeout = timeout;
@@ -59,6 +61,7 @@ public class JsonRequest extends AsyncTask<String, String, String> {
 	 * @param url
 	 */
 	private void setUrl(String url) {
+		Log.v(TAG, "setUrl(url): url = " + url);
 		try {
 			this.url = new URL(url);
 		} catch (MalformedURLException ex) {
@@ -74,6 +77,7 @@ public class JsonRequest extends AsyncTask<String, String, String> {
 	 * @return JsonRequest
 	 */
 	public void setListener(AsyncTaskCompleted listener) {
+		Log.v(TAG, "setListener(AsyncTaskCompleted listener)");
 		this.listener = listener;
 	}
 
@@ -84,6 +88,7 @@ public class JsonRequest extends AsyncTask<String, String, String> {
 
 	@Override
 	protected String doInBackground(String... params) {
+		Log.v(TAG, "doInBackground()");
 		try {
 			// initialisiere Http-Verbindung
 			HttpURLConnection httpConn = (HttpURLConnection) this.url
@@ -101,6 +106,7 @@ public class JsonRequest extends AsyncTask<String, String, String> {
 			// lies den Status Code aus lies die Response bei erfolgreicher
 			// Antwort aus
 			int status = httpConn.getResponseCode();
+			Log.v(TAG, "HTTP-Response Code: " + status);
 			switch (status) {
 			case 200:
 			case 201:
@@ -127,9 +133,9 @@ public class JsonRequest extends AsyncTask<String, String, String> {
 
 	@Override
 	protected void onPostExecute(String result) {
+		Log.v(TAG, "onPostExecute(result): result = " + result);
 		super.onPostExecute(result);
 
-		Log.d(TAG, "JsonRequest Response: " + result);
 		// übergibt die ausgewertete Response an den listener, Auswertung siehe
 		// getIpFromJson
 		listener.onTaskCompleted(getIpFromJson(result));
@@ -145,6 +151,7 @@ public class JsonRequest extends AsyncTask<String, String, String> {
 	 * @return IP-Address as String
 	 */
 	private String getIpFromJson(String jsonString) {
+		Log.v(TAG, "getIpFromJson(jsonString)");
 		try {
 			JSONObject json = new JSONObject(jsonString);
 			if (json.has("ip")) {

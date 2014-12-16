@@ -70,8 +70,9 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		Log.v(TAG, "onCreate()");
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);		
+		setContentView(R.layout.activity_main);
 		
 		// get the view elements
 		publicAddressField = (TextView) (findViewById(R.id.publicAddressField));
@@ -101,7 +102,7 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 			voipStream.setMode(RtpStream.MODE_NORMAL);
 
 			port = voipStream.getLocalPort();
-			addressField.setText("Eigene Adresse: " + ip + " : " + port);
+			addressField.setText("Lokale IP: " + ip + " : " + port);
 		} 
 		catch (Exception e) 
 		{
@@ -145,7 +146,6 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 			case IDLE:
 				connectCall();
 				break;
-
 			case CONNECTED:
 				disconnectCall();
 				break;
@@ -159,6 +159,7 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 	 * @param view
 	 */
 	public void audioModeBtnClick(View view) {
+		Log.v(TAG, "audioModeBtnClick()");
 		// Array mit den Audiomodes
 		final int[] modes = { AudioGroup.MODE_MUTED, AudioGroup.MODE_NORMAL,
 				AudioGroup.MODE_ON_HOLD };
@@ -173,7 +174,7 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 						// The 'which' argument contains the index position
 						// of the selected item
 						// int läuft von 0 bis length-1
-						Log.d(TAG, "Itemclicked: " + items[which]);
+						Log.v(TAG, "New AudioMode: " + items[which]);
 						audioGroup.setMode(modes[which]);
 					}
 				});
@@ -187,11 +188,7 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 	 * @param view
 	 */
 	public void shareIPButtonClick(View view){
-		/*
-		Intent smsIntent = new Intent(Intent.ACTION_VIEW);
-		smsIntent.setData(Uri.parse("sms:"));
-		smsIntent.putExtra("sms_body", "Hey! Lass und Voipen. Meine ip ist: " + ip + " und mein Port ist: " + port); 
-		startActivity(smsIntent);*/
+		Log.v(TAG, "shareIPButtonClick()");
 		
 		// bei mir auf dem Emulator startet das eine SMS und auf lollipop wo das failed eine email
 		Intent intent=new Intent(android.content.Intent.ACTION_SEND);
@@ -206,8 +203,6 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 		//startet Reiceiver zum Empfangen der Remote-Adresse
 		new AddressReceiver(this).start();
 		Toast.makeText(this, "AddressReceiver gestartet", Toast.LENGTH_LONG).show();
-
-
 	}
 
 	/**
@@ -241,6 +236,7 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 	 * VoIP-Stream beenden
 	 */
 	public void disconnectCall() {
+		Log.v(TAG, "disconnectCall()");
 		// leave group
 		voipStream.join(null);
 		audioGroup.clear();
@@ -258,8 +254,9 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 	 */
 	@Override
 	public void onTaskCompleted(String result) {
+		Log.v(TAG, "onTaskCompleted(result): result = " + result);
 		// schreib das ergebnis in das ip feld
-		publicAddressField.setText("öffentliche IP: " + result);
+		publicAddressField.setText("Öffentliche IP: " + result);
 	}
 	
 	/**
@@ -297,8 +294,7 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 	/**
 	 * sendet die eigene IP und Port an den Remote-Client, damit dieser seinen Stream associaten kann
 	 */
-	private void sendIP()
-	{
+	private void sendIP() {
 		String remIP = addressInput.getText().toString();
 		new AddressSender(remIP, ip, port).start();
 		Log.v(TAG, "sendIP() an " + remIP);

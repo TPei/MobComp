@@ -153,14 +153,19 @@ public class JsonRequest extends AsyncTask<String, String, String> {
 	private String getIpFromJson(String jsonString) {
 		Log.v(TAG, "getIpFromJson(jsonString)");
 		try {
-			JSONObject json = new JSONObject(jsonString);
-			if (json.has("ip")) {
-				return json.getString("ip");
-			} else if (json.has("query")) {
-				return json.getString("query");
-			} else {
-				return json.toString();
+			if (jsonString != null)
+			{
+				JSONObject json = new JSONObject(jsonString);
+				if (json.has("ip")) {
+					return json.getString("ip");
+				} else if (json.has("query")) {
+					return json.getString("query");
+				} else {
+					return json.toString();
+				}
+				
 			}
+			else return "";
 		} catch (JSONException ex) {
 			return jsonString;
 		}

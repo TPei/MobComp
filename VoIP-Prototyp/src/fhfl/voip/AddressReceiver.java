@@ -33,9 +33,17 @@ public class AddressReceiver extends Thread {
 		}
 	}
 	
-	private void receive() throws IOException {
+	private void receive() {
 		Log.v(TAG, "receive()");
-		dSocket.receive(incomingPacket);
+		try
+		{
+			dSocket.receive(incomingPacket);
+		}
+		catch (IOException e)
+		{
+			Log.e(TAG, "receive(): IOException");
+		}
+		
 		String message = new String(incomingPacket.getData(), 0 , incomingPacket.getLength());
 		String remoteIP = message.substring(0, message.indexOf(":"));
 		int remotePort = Integer.parseInt(message.substring(message.indexOf(":")+1));
@@ -44,13 +52,7 @@ public class AddressReceiver extends Thread {
 
 	@Override
 	public void run() {
-		try 
-		{
-			receive();
-		} 
-		catch (Exception e) 
-		{
-			Log.e(TAG, "Exception in method receive()");
-		}		
+		receive();
+	
 	}
 }

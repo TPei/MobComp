@@ -264,31 +264,29 @@ public class MainActivity extends Activity implements AsyncTaskCompleted {
 	 * @param remoteIP IP unter der der Remote-Client erreichbar ist
 	 * @param remotePort Port unter dem der Remote-Client erreichbar ist
 	 */
-	protected void setRemoteAddress(String remoteIP, int remotePort) {
-		Log.v(TAG, "setRemoteAddress() " + remoteIP + ":" + remotePort);
-		
-		runOnUiThread(new Runnable() {
-		    @Override
-		    public void run() {
-		    	callStateInfo.setText("Status: CONNECTED");
-				connectButton.setText("Disconnect");
-		    }
-		  });	
-				
-		audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
-		Toast.makeText(this, "Empfangen: " + remoteIP + ":" + remotePort, Toast.LENGTH_LONG).show();
+	protected void setRemoteAddress(final String remoteIP, final int remotePort) {
+		Log.v(TAG, "setRemoteAddress() " + remoteIP + ":" + remotePort);				
 		
 		try 
 		{
 			voipStream.associate(InetAddress.getByName(remoteIP), remotePort);
-			
+			voipStream.join(audioGroup);	
+			callState = CALL_STATES.CONNECTED;
+			//audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+			runOnUiThread(new Runnable() {
+			    @Override
+			    public void run() {
+			    	callStateInfo.setText("Status: CONNECTED");
+					connectButton.setText("Disconnect");
+					addressInput.setText(remoteIP);
+					portInput.setText(String.valueOf(remotePort));
+			    }
+			  });			
 		} 
 		catch (UnknownHostException e) 
 		{
 			Log.e(TAG, "setRemoteAddress(): Error while associating stream");
 		}
-		voipStream.join(audioGroup);	
-		callState = CALL_STATES.CONNECTED;
 	}
 	
 	/**
